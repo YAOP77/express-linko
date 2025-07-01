@@ -23,20 +23,18 @@ const PORT = process.env.PORT || 4000;
 connectMongoDB();
 
 app.use(express.json());
-app.use(cors({ exposedHeaders: ["Authorization"] })); // ✅ Permet au client d'envoyer le header
+app.use(cors({ exposedHeaders: ["Authorization"] }));
 
 app.use("/api/auth", require("./routes/auth.routes"));
 app.use("/api/users", require("./routes/user.routes"));
 app.use("/api/chatroom", require("./routes/chatroom.routes"));
 app.use("/api/rooms", require("./routes/room.routes"));
 
-// --- Import de la logique socket.io ---
 require("./socket")(io);
 
 app.use('/uploads', express.static(require('path').join(__dirname, 'uploads')));
 
-// console.log('FRONTEND_URL:', process.env.FRONTEND_URL);
-
+// ✅ Ce message est plus neutre pour un environnement cloud
 server.listen(PORT, () => {
-  console.log(`Serveur démarré sur http://localhost:${PORT}`);
+  console.log(`✅ Serveur démarré sur le port ${PORT}`);
 });
