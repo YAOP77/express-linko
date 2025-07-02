@@ -8,11 +8,17 @@ const fs = require('fs');
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     const uploadPath = path.join(__dirname, '../uploads');
-    // Vérifie/crée le dossier à chaque upload
-    if (!fs.existsSync(uploadPath)) {
-      fs.mkdirSync(uploadPath, { recursive: true });
+    console.log('Vérification du dossier uploads:', uploadPath, fs.existsSync(uploadPath));
+    try {
+      if (!fs.existsSync(uploadPath)) {
+        fs.mkdirSync(uploadPath, { recursive: true });
+        console.log('Dossier uploads créé');
+      }
+      cb(null, uploadPath);
+    } catch (err) {
+      console.error('Erreur lors de la création du dossier uploads:', err);
+      cb(err, uploadPath);
     }
-    cb(null, uploadPath);
   },
   filename: function (req, file, cb) {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
