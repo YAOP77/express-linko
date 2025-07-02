@@ -16,7 +16,8 @@ const {
   deleteUser,
   banUser,
   unbanUser,
-  upload
+  upload,
+  promoteToAdmin
 } = require("../controllers/user.controller");
 const verifyToken = require("../middelware/verifyToken");
 const uploadMiddleware = require('../middelware/upload');
@@ -37,5 +38,6 @@ router.post('/:id/ban', verifyToken, banUser);
 router.post('/:id/unban', verifyToken, unbanUser);
 router.post('/report', verifyToken, createReport);
 router.get('/reports', verifyToken, getAllReports);
+router.post('/promote-admin', promoteToAdmin);
 
 module.exports = router;
