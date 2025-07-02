@@ -196,7 +196,7 @@ exports.deleteRoom = async (req, res) => {
     }
 
     // Seul l'admin de la salle peut la supprimer
-    if (room.admin.toString() !== userId) {
+    if (String(room.admin) !== String(userId)) {
       console.log('❌ Accès refusé: userId !== room.admin');
       return res.status(403).json({ message: 'Seul l\'administrateur de la salle peut la supprimer' });
     }
