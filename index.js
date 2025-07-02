@@ -30,7 +30,15 @@ if (!fs.existsSync(uploadsDir)) {
 connectMongoDB();
 
 app.use(express.json());
-app.use(cors({ exposedHeaders: ["Authorization"] }));
+app.use(cors({
+  origin: process.env.FRONTEND_URL || "https://linko-app.vercel.app",
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  exposedHeaders: ["Authorization"],
+  credentials: true
+}));
+// Pour répondre aux requêtes préflight (OPTIONS)
+app.options('*', cors());
 
 app.use("/api/auth", require("./routes/auth.routes"));
 app.use("/api/users", require("./routes/user.routes"));
