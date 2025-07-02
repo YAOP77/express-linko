@@ -401,31 +401,4 @@ exports.unbanUser = async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: 'Erreur lors du débannissement', error: error.message });
   }
-};
-
-// Route/méthode temporaire pour promouvoir un utilisateur en admin
-exports.promoteToAdmin = async (req, res) => {
-  try {
-    const { email } = req.body;
-    if (!email) return res.status(400).json({ message: 'Email requis' });
-    const user = await User.findOneAndUpdate(
-      { email },
-      { isAdmin: true },
-      { new: true }
-    );
-    if (!user) return res.status(404).json({ message: 'Utilisateur non trouvé' });
-    res.json({ message: 'Utilisateur promu admin', user });
-  } catch (error) {
-    res.status(500).json({ message: 'Erreur lors de la promotion', error: error.message });
-  }
-};
-
-// Route temporaire pour lister tous les utilisateurs avec leur email et isAdmin
-exports.listAdmins = async (req, res) => {
-  try {
-    const users = await User.find({}, 'email isAdmin username');
-    res.json(users);
-  } catch (error) {
-    res.status(500).json({ message: 'Erreur lors de la récupération des utilisateurs', error: error.message });
-  }
 }; 

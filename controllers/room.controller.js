@@ -188,25 +188,20 @@ exports.deleteRoom = async (req, res) => {
     const userId = req.user.id;
 
     const room = await Room.findById(roomId);
-    console.log('🔍 DEBUG deleteRoom:');
-    console.log('  - userId:', userId);
-    console.log('  - room.admin:', room ? room.admin : 'room not found');
     if (!room) {
       return res.status(404).json({ message: 'Salle non trouvée' });
     }
 
     // Seul l'admin de la salle peut la supprimer
-    if (String(room.admin) !== String(userId)) {
-      console.log('❌ Accès refusé: userId !== room.admin');
+    if (room.admin.toString() !== userId) {
       return res.status(403).json({ message: 'Seul l\'administrateur de la salle peut la supprimer' });
     }
 
     // Supprimer la salle
     await Room.findByIdAndDelete(roomId);
-    console.log('✅ Salle supprimée avec succès');
+
     res.json({ message: 'Salle supprimée avec succès' });
   } catch (error) {
-    console.error('❌ Erreur deleteRoom:', error);
     res.status(500).json({ message: 'Erreur lors de la suppression de la salle', error: error.message });
   }
 }; 
