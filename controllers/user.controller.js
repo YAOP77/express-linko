@@ -102,57 +102,48 @@ exports.updateUserProfile = async (req, res) => {
 
 // Upload d'un avatar utilisateur
 exports.uploadAvatar = async (req, res) => {
-  upload(req, res, async (err) => {
-    if (err) {
-      return res.status(400).json({ message: err.message });
-    }
-
+  try {
     if (!req.file) {
       return res.status(400).json({ message: 'Aucun fichier envoyé' });
     }
 
-    try {
-      const { id } = req.params;
-      
-      // Vérifier que l'utilisateur met à jour son propre avatar
-      if (id !== req.user.id) {
-        return res.status(403).json({ message: 'Vous ne pouvez modifier que votre propre avatar' });
-      }
-
-      const fileName = req.file.filename;
-      
-      // Mettre à jour l'avatar de l'utilisateur
-      const updatedUser = await User.findByIdAndUpdate(
-        id,
-        { avatar: fileName },
-        { new: true }
-      ).select('_id username avatar status age hobby localisation');
-
-      if (!updatedUser) {
-        return res.status(404).json({ message: 'Utilisateur non trouvé' });
-      }
-
-      // Émettre l'événement socket pour la mise à jour en temps réel
-      // Note: req.app.get('io') sera configuré dans index.js
-      const io = req.app.get('io')
-      if (io) {
-        io.emit('userAvatarUpdated', {
-          userId: id, 
-          newAvatar: fileName,
-          user: updatedUser 
-        });
-        console.log('📤 SOCKET - Événement userAvatarUpdated émis');
-      }
-
-      res.json({
-        message: 'Avatar mis à jour avec succès',
-        avatar: fileName,
-        user: updatedUser
-      });
-    } catch (error) {
-      res.status(500).json({ message: 'Erreur lors de l\'upload de l\'avatar', error: error.message });
+    const { id } = req.params;
+    // Vérifier que l'utilisateur met à jour son propre avatar
+    if (id !== req.user.id) {
+      return res.status(403).json({ message: 'Vous ne pouvez modifier que votre propre avatar' });
     }
-  });
+
+    const fileName = req.file.filename;
+    // Mettre à jour l'avatar de l'utilisateur
+    const updatedUser = await User.findByIdAndUpdate(
+      id,
+      { avatar: fileName },
+      { new: true }
+    ).select('_id username avatar status age hobby localisation');
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: 'Utilisateur non trouvé' });
+    }
+
+    // Émettre l'événement socket pour la mise à jour en temps réel
+    const io = req.app.get('io')
+    if (io) {
+      io.emit('userAvatarUpdated', {
+        userId: id, 
+        newAvatar: fileName,
+        user: updatedUser 
+      });
+      console.log('📤 SOCKET - Événement userAvatarUpdated émis');
+    }
+
+    res.json({
+      message: 'Avatar mis à jour avec succès',
+      avatar: fileName,
+      user: updatedUser
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Erreur lors de l\'upload de l\'avatar', error: error.message });
+  }
 };
 
 // Bloquer un utilisateur
