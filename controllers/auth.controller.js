@@ -29,10 +29,10 @@ const loginUser = async (req, res) => {
     const isMatch = await bcrypt.compare(password, hashPassword);
     if(!isMatch) return res.status(400).json({ message: "Mot de passe incorrect" });
 
-    console.log('🔍 DEBUG loginUser:');
-    console.log('  - user._id:', user._id);
-    console.log('  - user.isAdmin:', user.isAdmin);
-    console.log('  - user.email:', user.email);
+    // console.log('🔍 DEBUG loginUser:');
+    // console.log('  - user._id:', user._id);
+    // console.log('  - user.isAdmin:', user.isAdmin);
+    // console.log('  - user.email:', user.email);
 
     const token = jwt.sign({ 
       id: user._id, 
@@ -41,7 +41,7 @@ const loginUser = async (req, res) => {
       expiresIn: "3d",
     });
 
-    console.log('  - Token généré avec isAdmin:', user.isAdmin);
+    // console.log('  - Token généré avec isAdmin:', user.isAdmin);
 
     // ✅ Et on renvoie l'utilisateur pour le front
     res.json({
