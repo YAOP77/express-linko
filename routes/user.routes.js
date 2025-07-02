@@ -19,6 +19,7 @@ const {
   upload
 } = require("../controllers/user.controller");
 const verifyToken = require("../middelware/verifyToken");
+const uploadMiddleware = require('../middelware/upload');
 
 router.get("/search", verifyToken, searchUsers);
 router.get("/online", getOnlineUsers);
@@ -26,7 +27,7 @@ router.get("/all", verifyToken, getAllUsers);
 router.get("/:id", verifyToken, getUserById);
 router.put("/:id", verifyToken, updateUserProfile);
 // router.post("/:id/avatar", verifyToken, uploadAvatar);
-router.post("/:id/avatar", verifyToken, upload.single("avatar"), uploadAvatar);
+router.post("/:id/avatar", verifyToken, uploadMiddleware.single('avatar'), uploadAvatar);
 router.post("/:id/block", verifyToken, blockUser);
 router.post("/:id/unblock", verifyToken, unblockUser);
 router.get("/:id/is-blocked", verifyToken, isBlocked);
