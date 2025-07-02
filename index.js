@@ -2,6 +2,8 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const connectMongoDB = require("./config/db");
+const fs = require('fs');
+const path = require('path');
 
 const http = require("http");
 const socketIo = require("socket.io");
@@ -19,6 +21,11 @@ const io = socketIo(server, {
 app.set('io', io);
 
 const PORT = process.env.PORT || 4000;
+
+const uploadsDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir);
+}
 
 connectMongoDB();
 
