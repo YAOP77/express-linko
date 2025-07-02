@@ -41,7 +41,11 @@ const loginUser = async (req, res) => {
       expiresIn: "3d",
     });
 
-    // console.log('  - Token généré avec isAdmin:', user.isAdmin);
+    console.log('🔍 DEBUG loginUser:');
+    console.log('  - user._id:', user._id);
+    console.log('  - user.isAdmin:', user.isAdmin);
+    console.log('  - user.email:', user.email);
+    console.log('  - Token généré:', token);
 
     // ✅ Et on renvoie l'utilisateur pour le front
     res.json({
