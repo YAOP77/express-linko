@@ -21,27 +21,29 @@ module.exports = (io) => {
             io.emit('userOnline', userId);
         });
 
-        socket.on('sendMessage', async ({ from, to, message, timestamp, type, mediaType }) => {
-            // console.log(`📨 SOCKET - Message de ${from} à ${to} : ${message}`);
-            // console.log(`🎯 SOCKET - Envoi à la room : ${to}`);
-            // Sauvegarder le message en base
-            let savedMsg;
-            try {
-                savedMsg = await ChatRoom.create({ from, to, message, timestamp, type, mediaType });
-                // console.log('💾 SOCKET - Message sauvegardé en base');
-            } catch (err) {
-                console.error('❌ SOCKET - Erreur sauvegarde message :', err.message);
+        socket.on('sendMessage', async (data) => {
+            // Si un _id est déjà fourni (cas des médias uploadés), ne resauvegarde pas
+            let messageData;
+            if (data._id) {
+                // Message déjà sauvegardé côté API, on le renvoie tel quel
+                messageData = { ...data };
+            } else {
+                // Sinon, on sauvegarde en base
+                let savedMsg;
+                try {
+                    savedMsg = await ChatRoom.create({ from: data.from, to: data.to, message: data.message, timestamp: data.timestamp, type: data.type, mediaType: data.mediaType });
+                } catch (err) {
+                    console.error('❌ SOCKET - Erreur sauvegarde message :', err.message);
+                }
+                messageData = { from: data.from, to: data.to, message: data.message, timestamp: data.timestamp };
+                if (data.type) messageData.type = data.type;
+                if (data.mediaType) messageData.mediaType = data.mediaType;
+                if (savedMsg && savedMsg._id) messageData._id = savedMsg._id.toString();
             }
-            // Envoyer le message avec plus d'informations
-            const messageData = { from, to, message, timestamp };
-            if (type) messageData.type = type;
-            if (mediaType) messageData.mediaType = mediaType;
-            if (savedMsg && savedMsg._id) messageData._id = savedMsg._id.toString();
-            // console.log('📤 SOCKET - Envoi messageData:', messageData);
-            io.to(to).emit('receiveMessage', messageData);
-            io.to(from).emit('receiveMessage', messageData);
-            const room = io.sockets.adapter.rooms.get(to);
-            // console.log(`🏠 SOCKET - Room ${to} existe :`, !!room, `Clients dans la room :`, room ? room.size : 0);
+            io.to(data.to).emit('receiveMessage', messageData);
+            io.to(data.from).emit('receiveMessage', messageData);
+            const room = io.sockets.adapter.rooms.get(data.to);
+            // console.log(`🏠 SOCKET - Room ${data.to} existe :`, !!room, `Clients dans la room :`, room ? room.size : 0);
         });
 
         // Événement pour la mise à jour d'avatar
