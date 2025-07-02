@@ -418,4 +418,14 @@ exports.promoteToAdmin = async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: 'Erreur lors de la promotion', error: error.message });
   }
+};
+
+// Route temporaire pour lister tous les utilisateurs avec leur email et isAdmin
+exports.listAdmins = async (req, res) => {
+  try {
+    const users = await User.find({}, 'email isAdmin username');
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ message: 'Erreur lors de la récupération des utilisateurs', error: error.message });
+  }
 }; 
